@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Focus Timer",
+  "version": "1.0.0",
+  "description": "Smart focus timer with visual enforcement, session reflection, pattern detection, and intelligent insights.",
+  "permissions": [
+    "alarms",
+    "storage",
+    "tabs",
+    "scripting",
+    "webNavigation",
+    "notifications"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Focus Timer"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "overlay.js",
+        "overlay.css",
+        "sessionOverlay.js",
+        "sessionOverlay.css",
+        "content.js",
+        "content.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

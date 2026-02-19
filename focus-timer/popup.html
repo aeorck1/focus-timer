@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Focus Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Reflection Modal (shown after session completes) ── -->
+    <div class="modal-backdrop" id="reflectionModal" style="display:none">
+      <div class="modal-card">
+        <div class="modal-score-ring" id="modalScoreRing">
+          <svg viewBox="0 0 80 80" fill="none">
+            <circle class="mscore-track" cx="40" cy="40" r="32"/>
+            <circle class="mscore-fill" id="mscore-fill" cx="40" cy="40" r="32"
+              stroke-dasharray="201" stroke-dashoffset="201"/>
+          </svg>
+          <div class="modal-score-num" id="modalScoreNum">—</div>
+        </div>
+        <div class="modal-quality-label" id="modalQualityLabel">—</div>
+        <h3 class="modal-title">Session complete ✓</h3>
+        <p class="modal-sub">What did you accomplish?</p>
+        <textarea
+          id="reflectionText"
+          class="reflection-textarea"
+          placeholder="Finished the auth module, reviewed PRs…"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <div class="modal-actions">
+          <button class="modal-btn-primary" id="saveReflectionBtn">Save</button>
+          <button class="modal-btn-ghost" id="skipReflectionBtn">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Nav Tabs ── -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="timer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Timer
+      </button>
+      <button class="tab-btn" data-tab="stats">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Weekly
+      </button>
+      <button class="tab-btn" data-tab="insights">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 20h20M6 20V10M10 20V4M14 20V14M18 20V8"/></svg>
+        Insights
+      </button>
+      <button class="tab-btn" data-tab="settings">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Sites
+      </button>
+    </nav>
+
+    <!-- ════════════════════════ TIMER TAB ════════════════════════ -->
+    <div class="tab-panel active" id="tab-timer">
+
+      <header class="header">
+        <span class="logo">FOCUS</span>
+        <div class="streak-badge" id="streakBadge" title="Day streak">
+          <svg width="11" height="14" viewBox="0 0 11 14" fill="none">
+            <path d="M6 0C6 0 7.5 3 6.5 5.5C8 4.5 9 2.5 9 2.5C9 2.5 11 6 9.5 9C8.5 11 6.5 12.5 5.5 13C4.5 12.5 2.5 11 1.5 9C0 6 2 2.5 2 2.5C2 2.5 3 4.5 4.5 5.5C3.5 3 5 0 6 0Z" fill="currentColor"/>
+          </svg>
+          <span id="streakCount">0</span>
+        </div>
+      </header>
+
+      <div class="timer-container">
+        <svg class="ring ring-idle" viewBox="0 0 200 200" fill="none">
+          <circle class="ring-track" cx="100" cy="100" r="85" />
+          <circle class="ring-progress" id="ringProgress" cx="100" cy="100" r="85"
+            stroke-dasharray="534" stroke-dashoffset="534" />
+          <circle class="ring-glow" id="ringGlow" cx="100" cy="100" r="85"
+            stroke-dasharray="534" stroke-dashoffset="534" />
+        </svg>
+        <div class="timer-center">
+          <div class="time-display" id="timeDisplay">25:00</div>
+          <div class="timer-label" id="timerLabel">READY</div>
+          <div class="session-meta" id="sessionMeta" style="display:none">
+            <span class="meta-chip distraction-chip" id="distractionChip" style="display:none">
+              ⚡ <span id="distractionCount">0</span>
+            </span>
+            <span class="meta-chip switch-chip">
+              ↕ <span id="tabSwitchCount">0</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live score bar -->
+      <div class="score-preview" id="scorePreview" style="display:none">
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill" id="scoreBarFill"></div>
+        </div>
+        <span class="score-label">Score <strong id="scoreLive">100</strong></span>
+      </div>
+
+      <div class="presets" id="presetsRow">
+        <button class="preset active" data-mins="25">25m</button>
+        <button class="preset" data-mins="45">45m</button>
+        <button class="preset" data-mins="90">90m</button>
+        <button class="preset custom-preset" id="customBtn">—</button>
+      </div>
+
+      <div class="custom-input-row" id="customRow" style="display:none">
+        <input type="number" id="customMins" min="1" max="180" placeholder="minutes" class="custom-input" />
+        <button class="set-btn" id="setCustom">Set</button>
+      </div>
+
+      <div class="controls">
+        <button class="btn-reset" id="resetBtn" title="Reset">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.5"></path>
+          </svg>
+        </button>
+        <button class="btn-primary" id="mainBtn">Start</button>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <span class="stat-label">TODAY</span>
+          <span class="stat-value" id="todayMinutes">0m</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-label">SESSIONS</span>
+          <span class="stat-value" id="todaySessions">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-label">DISTRACTIONS</span>
+          <span class="stat-value" id="todayDistractions">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════════════════ WEEKLY STATS TAB ═════════════════════ -->
+    <div class="tab-panel" id="tab-stats">
+      <div class="panel-header">
+        <span class="panel-title">This Week</span>
+        <span class="panel-sub" id="weekRange">—</span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card accent">
+          <div class="summary-val" id="wkFocusTotal">0m</div>
+          <div class="summary-label">Focus Time</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-val" id="wkAvgScore">—</div>
+          <div class="summary-label">Avg Score</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-val" id="wkBestDay">—</div>
+          <div class="summary-label">Best Day</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-val" id="wkDistractTotal">0m</div>
+          <div class="summary-label">Distracted</div>
+        </div>
+      </div>
+
+      <!-- Quality breakdown -->
+      <div class="quality-section">
+        <div class="quality-header">Session Quality</div>
+        <div class="quality-bars" id="qualityBars"></div>
+      </div>
+
+      <!-- Day bars -->
+      <div class="chart-wrap">
+        <div class="chart-bars" id="chartBars"></div>
+        <div class="chart-labels" id="chartLabels"></div>
+      </div>
+
+      <!-- Recent sessions -->
+      <div class="sessions-section">
+        <div class="sessions-header">Recent Sessions</div>
+        <div class="sessions-list" id="sessionsList"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ INSIGHTS TAB ══════════════════════ -->
+    <div class="tab-panel" id="tab-insights">
+      <div class="panel-header">
+        <span class="panel-title">Insights</span>
+        <span class="panel-sub">Based on your history</span>
+      </div>
+
+      <!-- Pattern stats row -->
+      <div class="insight-stat-row" id="insightStatRow">
+        <div class="insight-stat">
+          <div class="insight-stat-val" id="iPeakHour">—</div>
+          <div class="insight-stat-label">Peak Hour</div>
+        </div>
+        <div class="insight-stat">
+          <div class="insight-stat-val" id="iPeakDay">—</div>
+          <div class="insight-stat-label">Best Day</div>
+        </div>
+        <div class="insight-stat">
+          <div class="insight-stat-val" id="iAvgScore">—</div>
+          <div class="insight-stat-label">All-time Avg</div>
+        </div>
+      </div>
+
+      <!-- Heatmap: focus by hour -->
+      <div class="heatmap-section">
+        <div class="heatmap-label">Focus by time of day</div>
+        <div class="heatmap" id="heatmap"></div>
+        <div class="heatmap-axis" id="heatmapAxis"></div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="suggestions-section">
+        <div class="suggestions-label">Recommendations</div>
+        <div class="suggestions-list" id="suggestionsList">
+          <div class="no-data-msg">Complete a few sessions to unlock insights.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════════════════ SETTINGS TAB ════════════════════════ -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="panel-header">
+        <span class="panel-title">Distracting Sites</span>
+        <span class="panel-sub">Blocked during sessions</span>
+      </div>
+
+      <div class="site-add-row">
+        <input type="text" id="siteInput" placeholder="e.g. reddit.com" class="custom-input" />
+        <button class="set-btn" id="siteAddBtn">Add</button>
+      </div>
+
+      <div class="sites-list" id="sitesList"></div>
+    </div>
+
+  </div><!-- /app -->
+  <script src="popup.js"></script>
+</body>
+</html>
