@@ -43,7 +43,6 @@ html, body {
     radial-gradient(ellipse 55% 30% at 50% 0%, rgba(129,140,248,0.08) 0%, transparent 70%),
     var(--bg);
   position: relative;
-  /* scrollbar-width: none; */
 }
 
 /* ─── Reflection Modal ────────────────────────────────────────────────────── */

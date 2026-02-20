@@ -45,7 +45,7 @@ html.__ft_blurred__ > body {
 #__ft_indicator__ .ft-ind-dot {
   width: 7px !important;
   height: 7px !important;
-  /* background: #818cf8 !important; */
+  background: #818cf8 !important;
   border-radius: 50% !important;
   box-shadow: 0 0 8px rgba(129,140,248,0.8) !important;
   animation: ft-dot-pulse 2s ease-in-out infinite !important;

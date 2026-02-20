@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Focus Timer",
-  "version": "1.0.0",
-  "description": "Smart focus timer with visual enforcement, session reflection, pattern detection, and intelligent insights.",
+  "version": "5.0.0",
+  "description": "Open-source attention engine with deep work tracking, visual enforcement, and intelligent insights.",
   "permissions": [
     "alarms",
     "storage",
@@ -15,7 +15,8 @@
     "<all_urls>"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
@@ -33,10 +34,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "overlay.js",
-        "overlay.css",
-        "sessionOverlay.js",
-        "sessionOverlay.css",
         "content.js",
         "content.css"
       ],
@@ -44,8 +41,8 @@
     }
   ],
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }
