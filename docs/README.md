@@ -66,7 +66,7 @@ focus-timer-v5/
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-org/focus-timer.git
+   git clone https://github.com/aeorck1/focus-timer.git
    cd focus-timer
    ```
 
@@ -74,7 +74,7 @@ focus-timer-v5/
 
 3. Enable **Developer mode** (top-right toggle)
 
-4. Click **Load unpacked** and select the `focus-timer-v5/` directory
+4. Click **Load unpacked** and select the `focus-timer/` directory
 
 5. The Focus Timer icon appears in your toolbar. Pin it and start a session.
 
@@ -88,8 +88,8 @@ Focus Timer uses native ES modules supported by Chrome's MV3 service worker. The
 
 ```bash
 # Clone
-git clone https://github.com/your-org/focus-timer.git
-cd focus-timer/focus-timer-v5
+git clone https://github.com/aeorck1/focus-timer.git
+cd focus-timer/focus-timer
 
 # Open in your editor
 code .
@@ -139,7 +139,7 @@ When the session ends:
 
 ## Plugin System
 
-Focus Timer exposes a hook-based plugin API. See [PLUGIN_DEVELOPMENT.md](docs/PLUGIN_DEVELOPMENT.md) for the full guide.
+Focus Timer exposes a hook-based plugin API. See [PLUGIN_DEVELOPMENT.md](PLUGIN_DEVELOPMENT.md) for the full guide.
 
 Quick example:
 
@@ -161,13 +161,13 @@ registerPlugin({
 
 ## Contributing
 
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for how to submit issues, PRs, and feature requests.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit issues, PRs, and feature requests.
 
 ---
 
 ## Roadmap
 
-See [ROADMAP.md](docs/ROADMAP.md) for planned features and the contribution wishlist.
+See [ROADMAP.md](ROADMAP.md) for planned features and the contribution wishlist.
 
 ---
 

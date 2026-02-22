@@ -318,7 +318,7 @@ async function loadWeekly() {
       const dateStr = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
       const score   = s.score ?? '—';
       const sc      = typeof score === 'number' ? scoreColor(score) : '#5a6080';
-      const ql      = s.qualityLabel || '';
+      const ql      = s.qualityLabel || '';   
       const qlColor = qualityColor(ql);
       const ref     = refs[s.id];
       return `<div class="session-row">
@@ -331,7 +331,7 @@ async function loadWeekly() {
           ${ref ? `<span class="session-reflection">"${ref.text.slice(0,60)}${ref.text.length>60?'…':''}"</span>` : ''}
         </div>
         <div class="session-right">
-          ${s.distractionVisits ? `<span class="session-dist">⚡${s.distractionVisits}</span>` : ''}
+          ${!s.distractionVisits ? `<span class="session-dist">⚡${s.distractionVisits}</span>` : ''}
           <span class="session-score" style="color:${sc}">${score}</span>
         </div>
       </div>`;

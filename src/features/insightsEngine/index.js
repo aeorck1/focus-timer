@@ -5,7 +5,31 @@
  * rule-based recommendations. All analysis is performed locally — no data
  * ever leaves the browser.
  *
-*
+ * KEY FIXES in this version
+ * ─────────────────────────
+ * Bug 1 — Time-of-day bucketing:
+ *   Previously the code called `new Date(session.startTime || Date.now())` and
+ *   then read `.getHours()`. The `.getHours()` call itself is local-time-safe,
+ *   but the `|| Date.now()` fallback silently re-bucketed any session with a
+ *   missing or zero timestamp to the *current* hour, poisoning historical data.
+ *   Additionally the patterns object returned by storage was mutated in-place,
+ *   creating a race condition when multiple sessions completed in quick succession.
+ *   Fix: validate timestamps strictly via `getLocalHour()`, deep-copy the
+ *   patterns object before mutation, and reject invalid sessions with a warning.
+ *
+ * Bug 2 — Weekly chart off-by-one:
+ *   `storageAdapter._weekKey()` derives the Monday anchor using
+ *   `toISOString().slice(0, 10)`, which is always a UTC date string.
+ *   A user in a UTC− timezone finishing a session late on Sunday (local) is
+ *   already past UTC midnight, so their session's ISO date is "Monday" — one
+ *   day ahead of where it belongs. The bar chart and `focusMinutesByDay` index
+ *   then disagree with the user's calendar.
+ *   Fix: all ISO date and weekday computations now use `_localISODate()` and
+ *   `getWeekdayIndex()`, which derive dates from local clock fields
+ *   (getFullYear / getMonth / getDate / getDay) rather than UTC methods.
+ *   `isSameWeek()` uses the same local-date anchor, making week boundary
+ *   detection consistent regardless of timezone or DST transitions.
+ *
  * @module features/insightsEngine
  */
 
@@ -208,8 +232,11 @@ export async function recordPattern(session, score) {
   _ensureArrayLength(p.scoresByHour,       24);
 
   // ── Apply increments ──────────────────────────────────────────────────────
+  // focusMinutesByDay is NOT updated here.
+  // sessionManager._updateDailyStats() and _updateWeeklyData() already
+  // add focus minutes to daily/weekly totals. Writing it here too was
+  // the double-count bug: a 1m session showed as 2m in the timer.
   p.focusMinutesByHour[hour] += focusMins;
-  p.focusMinutesByDay[day]   += focusMins;
   p.distractionByHour[hour]  += distractMins;
   p.sessionsByHour[hour]     += 1;
   p.scoresByHour[hour]       += safeScore;
