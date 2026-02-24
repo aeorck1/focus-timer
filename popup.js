@@ -299,6 +299,8 @@ async function loadWeekly() {
     labelItems.push({ label: DAY_SHORT[d.getDay()], isToday: key === todayIso });
   }
 
+  // Bar chart with focus minutes (scaled to max of the week). Today's bar is highlighted and has a minimum height for visibility.
+  
   chartBars.innerHTML = bars.map(b => `
     <div class="bar-col"><div class="bar-track">
       <div class="bar-fill${b.isToday?' bar-today':''}" style="height:${Math.max(b.pct,2)}%" title="${b.mins}m"></div>
@@ -331,7 +333,7 @@ async function loadWeekly() {
           ${ref ? `<span class="session-reflection">"${ref.text.slice(0,60)}${ref.text.length>60?'…':''}"</span>` : ''}
         </div>
         <div class="session-right">
-          ${!s.distractionVisits ? `<span class="session-dist">⚡${s.distractionVisits}</span>` : ''}
+          ${s.distractionVisits ? `<span class="session-dist">⚡${s.distractionVisits}</span>` : ''}
           <span class="session-score" style="color:${sc}">${score}</span>
         </div>
       </div>`;
