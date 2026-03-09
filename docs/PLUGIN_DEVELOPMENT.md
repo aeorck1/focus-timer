@@ -235,7 +235,7 @@ const PLUGIN_KEY = 'plugin:streakNotifier:deepWorkCount';
 const StreakNotifierPlugin = {
   name:    'streak-notifier',
   version: '1.0.0',
-
+  const api = typeof browser !== "undefined" ? browser : chrome
   hooks: {
     [HOOKS.SESSION_END]: async ({ qualityLabel }) => {
       if (qualityLabel !== 'Deep Work') {

@@ -15,6 +15,9 @@ const SCORE_CIRC    = 201;
 const DAY_NAMES     = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_SHORT     = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
+// ------Browser type check -----------
+const api = typeof browser !== 'undefined' ? browser : chrome
+
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const timeDisplay       = $('timeDisplay');
 const timerLabel        = $('timerLabel');
@@ -100,7 +103,7 @@ function fmtHour(h) {
 }
 
 function msg(action, extra = {}) {
-  return new Promise(r => chrome.runtime.sendMessage({ action, ...extra }, r));
+  return new Promise(r => api.runtime.sendMessage({ action, ...extra }, r));
 }
 
 function calcLiveScore(s) {
@@ -493,7 +496,7 @@ function startTick() {
     if (remaining <= 0) {
       stopTick();
       const r = await new Promise(resolve =>
-        chrome.runtime.sendMessage({ action: 'getState' }, resolve));
+        api.runtime.sendMessage({ action: 'getState' }, resolve));
       if (r) { state = r.state; stats = r.stats; renderTimer(); }
       if (state?.pendingReflection) showReflectionModal(state.pendingReflection);
     }
@@ -507,7 +510,7 @@ function stopTick() {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   const r = await new Promise(resolve =>
-    chrome.runtime.sendMessage({ action: 'getState' }, resolve));
+    api.runtime.sendMessage({ action: 'getState' }, resolve));
   if (!r) return;
 
   state = r.state;

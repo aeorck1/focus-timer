@@ -74,15 +74,17 @@ export async function getDailyStats() {
 }
 
 // ❌ Bad — mixed concerns, no JSDoc, imperative
+
 export async function getStatsAndUpdateStreak(reset) {
-  let s = await chrome.storage.local.get('focusStats');
+  let s = await api.storage.local.get('focusStats');
   if (reset) s = {};
   s.streak = s.streak + 1;
-  chrome.storage.local.set(s);
+  api.storage.local.set(s);
   return s;
 }
 ```
-
+- **But before that, a variable with name "api" is created, to differentiate between Chrome and Firefox API browser** 
+- **Say for instance `const api = typeof browser !== "undefined"? browser : chrome`**- Where the "typeof  browser" checks the user's browser type before launching the extension
 ---
 
 ## Comments
@@ -130,7 +132,7 @@ export function calcFocusScore(session) {
 const sessions = await storage.getSessions();
 
 // ❌ Bad — direct storage access in a feature module
-const r = await chrome.storage.local.get('sessions');
+const r = await api.storage.local.get('sessions');
 ```
 
 ---
@@ -144,7 +146,7 @@ const r = await chrome.storage.local.get('sessions');
 ```js
 // ✅ Good
 try {
-  await chrome.tabs.sendMessage(tabId, payload);
+  await api.tabs.sendMessage(tabId, payload);
 } catch {
   // Tab closed before message was delivered — not a bug
 }

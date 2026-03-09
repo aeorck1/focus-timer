@@ -1,7 +1,7 @@
 // =============================================================================
 // Focus Timer — Content Script (Phase 4)
 // Runs at document_start on every page. Syncs with background state via
-// chrome.storage.onChanged and responds to messages from the background.
+// api.storage.onChanged and responds to messages from the background.
 // =============================================================================
 
 (function () {
@@ -10,6 +10,7 @@
   // Guard: only run once per document
   if (window.__focusTimerContentLoaded) return;
   window.__focusTimerContentLoaded = true;
+  const api= typeof browser !== 'undefined' ? browser : chrome;
 
   // ─── IDs & classnames ─────────────────────────────────────────────────────
   const INDICATOR_ID      = '__ft_indicator__';
@@ -100,7 +101,7 @@
     document.documentElement.appendChild(el);
 
     document.getElementById('ft-return-btn').addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'contentOverlayReturn' });
+      api.runtime.sendMessage({ action: 'contentOverlayReturn' });
       removeDistractionOverlay();
       window.history.back();
     });
@@ -108,7 +109,7 @@
     document.getElementById('ft-continue-btn').addEventListener('click', () => {
       continueAnyway = true;
       removeDistractionOverlay();
-      chrome.runtime.sendMessage({ action: 'contentOverlayContinue' });
+      api.runtime.sendMessage({ action: 'contentOverlayContinue' });
     });
   }
 
@@ -179,7 +180,7 @@
     // Save
     document.getElementById('ft-so-save').addEventListener('click', () => {
       const text = document.getElementById('ft-so-textarea')?.value?.trim() || '';
-      chrome.runtime.sendMessage({
+      api.runtime.sendMessage({
         action: 'saveReflection',
         sessionId: data.sessionId,
         text,
@@ -189,7 +190,7 @@
 
     // Skip
     document.getElementById('ft-so-skip').addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'skipReflection', sessionId: data.sessionId });
+      api.runtime.sendMessage({ action: 'skipReflection', sessionId: data.sessionId });
       removeSessionOverlay();
     });
 
@@ -241,17 +242,17 @@
 
   // ─── Initial sync from storage ────────────────────────────────────────────
   async function syncState() {
-    const data = await chrome.storage.local.get(['focusState', 'distractingSites']);
+    const data = await api.storage.local.get(['focusState', 'distractingSites']);
     const state = data.focusState || { status: 'idle', remaining: 0 };
     const sites = data.distractingSites || [];
     applyFocusMode(state, sites);
   }
 
   // ─── Listen for storage changes (real-time) ───────────────────────────────
-  chrome.storage.onChanged.addListener((changes, area) => {
+  api.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
     if (changes.focusState || changes.distractingSites) {
-      chrome.storage.local.get(['focusState', 'distractingSites'], (data) => {
+      api.storage.local.get(['focusState', 'distractingSites'], (data) => {
         const state = data.focusState || { status: 'idle', remaining: 0 };
         const sites = data.distractingSites || [];
         applyFocusMode(state, sites);
@@ -271,7 +272,7 @@
   });
 
   // ─── Listen for messages from background ──────────────────────────────────
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     switch (msg.action) {
       case 'showSessionOverlay':
         removeDistractionOverlay();

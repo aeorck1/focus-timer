@@ -32,6 +32,8 @@ import * as insights     from './src/features/insightsEngine/index.js';
  * Runs once when the service worker starts.
  * Initialises features, runs storage migrations, ensures today is in weekly data.
  */
+
+const api = typeof browser !== 'undefined' ? browser : chrome; // Firefox compatibility
 async function bootstrap() {
   await storage.migrate();
   await sessionMgr.ensureTodayInWeekly();
@@ -47,7 +49,7 @@ bootstrap().catch(err => console.error('[FocusTimer] Bootstrap failed:', err));
 
 // ─── Alarm Handler ────────────────────────────────────────────────────────────
 
-chrome.alarms.onAlarm.addListener(async ({ name }) => {
+api.alarms.onAlarm.addListener(async ({ name }) => {
   if (name === timer.ALARMS.COMPLETE) {
     const { state, completedSession } = await timer.complete();
     const sites = await storage.getDistractingSites();
@@ -64,7 +66,7 @@ chrome.alarms.onAlarm.addListener(async ({ name }) => {
 
 // ─── Tab Activation ───────────────────────────────────────────────────────────
 
-chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+api.tabs.onActivated.addListener(async ({ tabId }) => {
   const state = await storage.getState();
   if (state.status !== 'running' || !state.currentSession) return;
 
@@ -80,7 +82,7 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   await distraction.leaveDistraction();
 
   let tab;
-  try { tab = await chrome.tabs.get(tabId); } catch { return; }
+  try { tab = await api.tabs.get(tabId); } catch { return; }
   const url   = tab.url || tab.pendingUrl || '';
   const sites = await storage.getDistractingSites();
 
@@ -97,7 +99,7 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 
 // ─── Web Navigation ───────────────────────────────────────────────────────────
 
-chrome.webNavigation.onCommitted.addListener(async ({ tabId, url, frameId }) => {
+api.webNavigation.onCommitted.addListener(async ({ tabId, url, frameId }) => {
   if (frameId !== 0) return;
   const state = await storage.getState();
   if (state.status !== 'running' || !state.currentSession) return;
@@ -111,7 +113,7 @@ chrome.webNavigation.onCommitted.addListener(async ({ tabId, url, frameId }) => 
   else if (!wasDistracting && nowDistracting) await distraction.enterDistraction(tabId, url);
 });
 
-chrome.webNavigation.onCompleted.addListener(async ({ tabId, url, frameId }) => {
+api.webNavigation.onCompleted.addListener(async ({ tabId, url, frameId }) => {
   if (frameId !== 0) return;
   const state = await storage.getState();
   if (state.status !== 'running') return;
@@ -121,14 +123,14 @@ chrome.webNavigation.onCompleted.addListener(async ({ tabId, url, frameId }) => 
   // Short delay so the page DOM is settled before content script applies enforcement
   setTimeout(async () => {
     try {
-      await chrome.tabs.sendMessage(tabId, { action: 'applyFocusMode', state, sites });
+      await api.tabs.sendMessage(tabId, { action: 'applyFocusMode', state, sites });
     } catch { /* content script not yet ready; it will self-sync via storage.onChanged */ }
   }, 150);
 });
 
 // ─── Startup Recovery ─────────────────────────────────────────────────────────
 
-chrome.runtime.onStartup.addListener(async () => {
+api.runtime.onStartup.addListener(async () => {
   await bootstrap();
   const state = await timer.recover();
   if (state.status === 'running') {
@@ -140,7 +142,7 @@ chrome.runtime.onStartup.addListener(async () => {
 
 // ─── Message Router ───────────────────────────────────────────────────────────
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   _handleMessage(msg).then(sendResponse).catch(err => {
     console.error('[FocusTimer] Message handler error:', err);
     sendResponse({ error: err.message });

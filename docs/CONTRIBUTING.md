@@ -126,6 +126,8 @@ Short version:
 - Single quotes
 
 ---
+## API setup
+ const api = typeof browser !== "undefined" ? browser : chrome
 
 ## Where Things Live
 
@@ -134,7 +136,7 @@ Short version:
 | Timer state machine | `src/core/timerEngine.js` |
 | Session objects & streaks | `src/core/sessionManager.js` |
 | Score formula | `src/core/scoringEngine.js` |
-| All `chrome.storage` calls | `src/core/storageAdapter.js` |
+| All `api.storage` calls | `src/core/storageAdapter.js` |
 | Event hook system | `src/core/eventBus.js` |
 | Distraction visit tracking | `src/features/distractionTracking/` |
 | Reflection save/load | `src/features/reflectionSystem/` |
