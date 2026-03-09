@@ -19,7 +19,7 @@
 
 import * as storage       from '../../core/storageAdapter.js';
 import { on, HOOKS }      from '../../core/eventBus.js';
-
+const api = typeof browser !== 'undefined' ? browser : chrome; // Firefox compatibility
 // ─── Initialisation ───────────────────────────────────────────────────────────
 
 /**
@@ -64,13 +64,15 @@ export function isInjectableUrl(url) {
  */
 export async function ensureContentScript(tabId, url) {
   if (!isInjectableUrl(url)) return false;
+
+  
   try {
-    const resp = await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+    const resp = await api.tabs.sendMessage(tabId, { action: 'ping' });
     return resp?.loaded === true;
   } catch {
     try {
-      await chrome.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
-      await chrome.scripting.insertCSS({ target: { tabId }, files: ['content.css'] });
+      await api.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
+      await api.scripting.insertCSS({ target: { tabId }, files: ['content.css'] });
       return true;
     } catch { return false; }
   }
@@ -83,7 +85,7 @@ export async function ensureContentScript(tabId, url) {
  * @returns {Promise<void>}
  */
 export async function injectIntoAllTabs() {
-  const tabs = await chrome.tabs.query({});
+  const tabs = await api.tabs.query({});
   await Promise.allSettled(
     tabs
       .filter(t => isInjectableUrl(t.url))
@@ -102,7 +104,7 @@ export async function injectIntoAllTabs() {
  * @returns {Promise<void>}
  */
 export async function broadcastState(state, sites) {
-  const tabs = await chrome.tabs.query({});
+  const tabs = await api.tabs.query({});
   await Promise.allSettled(
     tabs
       .filter(t => isInjectableUrl(t.url))
@@ -116,7 +118,7 @@ export async function broadcastState(state, sites) {
  * @returns {Promise<void>}
  */
 export async function broadcastCleanup() {
-  const tabs = await chrome.tabs.query({});
+  const tabs = await api.tabs.query({});
   await Promise.allSettled(
     tabs
       .filter(t => isInjectableUrl(t.url))
@@ -135,12 +137,12 @@ export async function broadcastCleanup() {
  */
 export async function showSessionOverlay(data) {
   try {
-    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [activeTab] = await api.tabs.query({ active: true, currentWindow: true });
     if (!activeTab || !isInjectableUrl(activeTab.url)) {
       return _notifyFallback(data);
     }
     await ensureContentScript(activeTab.id, activeTab.url);
-    await chrome.tabs.sendMessage(activeTab.id, { action: 'showSessionOverlay', data });
+    await api.tabs.sendMessage(activeTab.id, { action: 'showSessionOverlay', data });
     return true;
   } catch {
     return _notifyFallback(data);
@@ -151,13 +153,13 @@ export async function showSessionOverlay(data) {
 
 /** Sends a message to a single tab, silently swallowing errors. */
 async function _msgTab(tabId, payload) {
-  try { await chrome.tabs.sendMessage(tabId, payload); } catch { /* no-op */ }
+  try { await api.tabs.sendMessage(tabId, payload); } catch { /* no-op */ }
 }
 
 /** Shows a Chrome notification as a fallback when no tab can receive the overlay. */
 function _notifyFallback({ duration, score, qualityLabel, sessionId }) {
   try {
-    chrome.notifications.create(`focusComplete_${sessionId}`, {
+    api.notifications.create(`focusComplete_${sessionId}`, {
       type:     'basic',
       iconUrl:  'icons/icon128.png',
       title:    `Focus Session Complete — ${qualityLabel}`,

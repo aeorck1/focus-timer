@@ -249,7 +249,7 @@ const StreakNotifierPlugin = {
       await storage.setValue(PLUGIN_KEY, count);
 
       if (count % 3 === 0) {
-        chrome.notifications.create(`streak-notifier-${Date.now()}`, {
+        api.notifications.create(`streak-notifier-${Date.now()}`, {
           type:     'basic',
           iconUrl:  'icons/icon128.png',
           title:    '🔥 Deep Work Streak!',

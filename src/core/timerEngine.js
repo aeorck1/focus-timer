@@ -41,15 +41,17 @@ export const ALARMS = Object.freeze({
  * @param {'idle'|'running'|'paused'} status
  * @param {number} [remaining=0] - Remaining seconds (used when running).
  */
+
+const api = typeof browser !== 'undefined' ? browser : chrome; // Firefox compatibility
 export function updateBadge(status, remaining = 0) {
   if (status === 'running') {
-    chrome.action.setBadgeText({ text: `${Math.ceil(remaining / 60)}m` });
-    chrome.action.setBadgeBackgroundColor({ color: '#818cf8' });
+    api.action.setBadgeText({ text: `${Math.ceil(remaining / 60)}m` });
+    api.action.setBadgeBackgroundColor({ color: '#818cf8' });
   } else if (status === 'paused') {
-    chrome.action.setBadgeText({ text: '⏸' });
-    chrome.action.setBadgeBackgroundColor({ color: '#64748b' });
+    api.action.setBadgeText({ text: '⏸' });
+    api.action.setBadgeBackgroundColor({ color: '#64748b' });
   } else {
-    chrome.action.setBadgeText({ text: '' });
+    api.action.setBadgeText({ text: '' });
   }
 }
 
@@ -211,14 +213,19 @@ export async function tick() {
 // ─── Startup Recovery ────────────────────────────────────────────────────────
 
 /**
- * Called on chrome.runtime.onStartup to recover timer state after browser restart.
+ * Called on api.runtime.onStartup to recover timer state after browser restart.
  * If a session was running when the browser was closed, we either complete it
  * (if the time has passed) or restore the remaining time and alarms.
  *
  * @returns {Promise<import('./storageAdapter.js').FocusState>}
+ * 
+ * 
  */
+
+
 export async function recover() {
   const state = await storage.getState();
+  const api = typeof browser !== 'undefined' ? browser : chrome; // Firefox compatibility
   if (state.status !== 'running') return state;
 
   const elapsed   = Math.floor((Date.now() - state.startedAt) / 1000) + state.elapsedBeforePause;
@@ -243,12 +250,12 @@ export async function recover() {
  * @param {number} durationSeconds
  */
 function _setAlarms(durationSeconds) {
-  chrome.alarms.create(ALARMS.COMPLETE, { delayInMinutes: durationSeconds / 60 });
-  chrome.alarms.create(ALARMS.TICK,     { periodInMinutes: 1 });
+  api.alarms.create(ALARMS.COMPLETE, { delayInMinutes: durationSeconds / 60 });
+  api.alarms.create(ALARMS.TICK,     { periodInMinutes: 1 });
 }
 
 /** Clears both alarms. Safe to call even if alarms are not set. */
 function _clearAlarms() {
-  chrome.alarms.clear(ALARMS.COMPLETE);
-  chrome.alarms.clear(ALARMS.TICK);
+  api.alarms.clear(ALARMS.COMPLETE);
+  api.alarms.clear(ALARMS.TICK);
 }

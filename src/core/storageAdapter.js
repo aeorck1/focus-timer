@@ -1,7 +1,7 @@
 /**
  * @fileoverview StorageAdapter — Focus Timer Core
  *
- * Provides a unified, type-safe abstraction over chrome.storage.local.
+ * Provides a unified, type-safe abstraction over api.storage.local.
  * All reads and writes across the extension go through this module.
  * This ensures data integrity, centralises schema definitions, and
  * makes it trivial to swap storage backends in the future.
@@ -86,25 +86,25 @@ export function defaultPatterns() {
 }
 
 // ─── Core API ─────────────────────────────────────────────────────────────────
-
+const api = typeof browser !== 'undefined' ? browser : chrome; // Cross-browser API access
 /**
- * Reads one or more keys from chrome.storage.local.
+ * Reads one or more keys from api.storage.local.
  *
  * @param {string|string[]} keys - Single key or array of keys to retrieve.
  * @returns {Promise<Object>} Object with the requested key/value pairs.
  */
 export async function get(keys) {
-  return chrome.storage.local.get(keys);
+  return api.storage.local.get(keys);
 }
 
 /**
- * Writes one or more key/value pairs to chrome.storage.local.
+ * Writes one or more key/value pairs to api.storage.local.
  *
  * @param {Object} items - Key/value map to persist.
  * @returns {Promise<void>}
  */
 export async function set(items) {
-  return chrome.storage.local.set(items);
+  return api.storage.local.set(items);
 }
 
 /**
@@ -116,7 +116,7 @@ export async function set(items) {
  * @returns {Promise<T>}
  */
 export async function getValue(key, fallback = null) {
-  const result = await chrome.storage.local.get(key);
+  const result = await api.storage.local.get(key);
   return result[key] !== undefined ? result[key] : fallback;
 }
 
@@ -128,7 +128,7 @@ export async function getValue(key, fallback = null) {
  * @returns {Promise<void>}
  */
 export async function setValue(key, value) {
-  return chrome.storage.local.set({ [key]: value });
+  return api.storage.local.set({ [key]: value });
 }
 
 /**
@@ -156,7 +156,7 @@ export async function update(key, fallback, updater) {
  * @returns {Promise<FocusState>}
  */
 export async function getState() {
-  const r = await chrome.storage.local.get(KEYS.STATE);
+  const r = await api.storage.local.get(KEYS.STATE);
   return r[KEYS.STATE] || defaultState();
 }
 
@@ -179,7 +179,7 @@ export async function patchState(patch) {
  * @returns {Promise<string[]>}
  */
 export async function getDistractingSites() {
-  const r = await chrome.storage.local.get(KEYS.SITES);
+  const r = await api.storage.local.get(KEYS.SITES);
   return r[KEYS.SITES] || [...DEFAULT_SITES];
 }
 
@@ -189,7 +189,7 @@ export async function getDistractingSites() {
  * @returns {Promise<Patterns>}
  */
 export async function getPatterns() {
-  const r = await chrome.storage.local.get(KEYS.PATTERNS);
+  const r = await api.storage.local.get(KEYS.PATTERNS);
   return r[KEYS.PATTERNS] || defaultPatterns();
 }
 
@@ -200,7 +200,7 @@ export async function getPatterns() {
  */
 export async function getWeeklyData() {
   const wk = _weekKey();
-  const r  = await chrome.storage.local.get(KEYS.WEEKLY);
+  const r  = await api.storage.local.get(KEYS.WEEKLY);
   const data = r[KEYS.WEEKLY];
   if (!data || data.weekStart !== wk) {
     const fresh = { weekStart: wk, days: {} };
@@ -216,7 +216,7 @@ export async function getWeeklyData() {
  * @returns {Promise<SessionObject[]>}
  */
 export async function getSessions() {
-  const r = await chrome.storage.local.get(KEYS.SESSIONS);
+  const r = await api.storage.local.get(KEYS.SESSIONS);
   return r[KEYS.SESSIONS] || [];
 }
 
@@ -240,7 +240,7 @@ export async function appendSession(session) {
  * @returns {Promise<Record<string, {text: string, savedAt: number}>>}
  */
 export async function getReflections() {
-  const r = await chrome.storage.local.get(KEYS.REFLECTIONS);
+  const r = await api.storage.local.get(KEYS.REFLECTIONS);
   return r[KEYS.REFLECTIONS] || {};
 }
 

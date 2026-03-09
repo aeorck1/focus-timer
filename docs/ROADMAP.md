@@ -6,7 +6,7 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v5.x — Stability & Polish (current)
+## v1.x — Stability & Polish (current)
 
 - [x] Modular ES module architecture
 - [x] Plugin system with safe hook execution
@@ -21,7 +21,7 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v6.0 — Data & Export
+## v2.0 — Data & Export
 
 - [ ] 🎯 Export sessions as CSV / JSON
 - [ ] Import sessions from CSV (data recovery)
@@ -31,7 +31,7 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v6.1 — Customisation
+## v3.0 — Customisation
 
 - [ ] 🎯 Configurable scoring weights (via settings UI)
 - [ ] Custom quality tier thresholds
@@ -41,7 +41,7 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v7.0 — Focus Goals
+## v4.0 — Focus Goals
 
 - [ ] 🎯 Daily focus goal (e.g. "4 hours / day")
 - [ ] Goal progress ring in popup header
@@ -50,7 +50,7 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v7.1 — Integrations (Plugin Opportunities)
+## v5.1 — Integrations (Plugin Opportunities)
 
 - [ ] 🎯 Todoist plugin — create a task on session start
 - [ ] Notion plugin — log sessions to a Notion database
@@ -59,9 +59,9 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ---
 
-## v8.0 — Multi-device Sync (Optional)
+## v6.0 — Multi-device Sync (Optional)
 
-- [ ] Optional `chrome.storage.sync` backend (for cross-device stats)
+- [x] Optional `api.storage.sync` backend (for cross-device stats)
 - [ ] Privacy-first: sync only aggregates, never raw session content
 - [ ] Sync toggle in settings (off by default)
 
@@ -78,4 +78,4 @@ Items marked 🎯 are the highest-priority contributions we are actively looking
 
 ## How to Influence the Roadmap
 
-Open a [GitHub Discussion](https://github.com/your-org/focus-timer/discussions) with your proposal. Features with clear community demand and a volunteer implementer get prioritised. Patches welcome for any roadmap item — check CONTRIBUTING.md first.
+Open a [GitHub Discussion](https://github.com/aeorck1/focus-timer/discussions) with your proposal. Features with clear community demand and a volunteer implementer get prioritised. Patches welcome for any roadmap item — check CONTRIBUTING.md first.

@@ -18,7 +18,7 @@ Focus Timer helps you build deep work habits by enforcing distraction-free sessi
 | 📈 **Weekly analytics** | Bar charts, quality breakdown, session history |
 | 💡 **Smart insights** | Rule-based recommendations from your own usage patterns |
 | 🔌 **Plugin system** | Extend via event hooks without touching core code |
-| 🔒 **100% local** | No account, no server, no telemetry — all data in `chrome.storage.local` |
+| 🔒 **100% local** | No account, no server, no telemetry — all data in `api.storage.local`  where api is `const api = typeof browser !== "undefined" ? browser : chrome |
 
 ---
 
@@ -38,7 +38,7 @@ focus-timer-v5/
     │   ├── timerEngine.js     ← Alarm management, session lifecycle
     │   ├── sessionManager.js  ← Session objects, streaks, daily stats
     │   ├── scoringEngine.js   ← Focus score, quality labels (pure functions)
-    │   ├── storageAdapter.js  ← chrome.storage.local abstraction
+    │   ├── storageAdapter.js  ← api.storage.local abstraction
     │   └── eventBus.js        ← Plugin hook system
     ├── features/
     │   ├── distractionTracking/  ← Tracks visits to distracting domains
@@ -56,7 +56,7 @@ focus-timer-v5/
 2. **No cross-module tight coupling** — modules communicate through `eventBus` or explicit imports of their public API.
 3. **Pure scoring** — `scoringEngine.js` has zero side effects and is trivially testable.
 4. **Plugin safety** — all plugin hooks are wrapped in try/catch; a crashing plugin cannot bring down the extension.
-5. **MV3 compliant** — uses `chrome.alarms` (no background `setInterval`), native ES modules via `"type": "module"`.
+5. **MV3 compliant** — uses `api.alarms` (no background `setInterval`), native ES modules via `"type": "module"`.
 
 ---
 
