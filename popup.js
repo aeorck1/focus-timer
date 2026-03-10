@@ -1,5 +1,5 @@
 // =============================================================================
-// Focus Timer — Popup Script (Phase 4)
+// Focus Timer — Popup Script (Phase 1.2)
 // Reflection is now handled by the in-page session overlay (content.js).
 // Popup only shows the pending reflection modal as a fallback if the user
 // opens the popup before visiting any page after session completion.
@@ -104,6 +104,7 @@ function fmtHour(h) {
 
 function msg(action, extra = {}) {
   return new Promise(r => api.runtime.sendMessage({ action, ...extra }, r));
+
 }
 
 function calcLiveScore(s) {
@@ -246,8 +247,10 @@ function renderTimer() {
 // ─── Weekly Stats ─────────────────────────────────────────────────────────────
 async function loadWeekly() {
   const [wRes, sRes] = await Promise.all([msg('getWeekly'), msg('getSessions')]);
+  console.log('Weekly data:', wRes, sRes);
   const weekly   = wRes?.weekly;
   const sessions = sRes?.sessions || [];
+  console.log("Each stats", sessions)
   if (!weekly) return;
 
   const wStart = new Date(weekly.weekStart + 'T00:00:00');

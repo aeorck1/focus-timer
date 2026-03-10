@@ -161,7 +161,8 @@ export async function reset() {
  */
 export async function complete() {
   _clearAlarms();
-  const state   = await storage.getState();
+  const state = await storage.getState();
+  if (state.status !== 'running') return { state, completedSession: null };
   const session = state.currentSession || sessionMgr.createSession(state.duration);
 
   const completedSession = await sessionMgr.completeSession(session, state.duration);

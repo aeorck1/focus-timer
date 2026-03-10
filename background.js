@@ -52,6 +52,7 @@ bootstrap().catch(err => console.error('[FocusTimer] Bootstrap failed:', err));
 api.alarms.onAlarm.addListener(async ({ name }) => {
   if (name === timer.ALARMS.COMPLETE) {
     const { state, completedSession } = await timer.complete();
+    if (!completedSession) return;
     const sites = await storage.getDistractingSites();
     await visual.showSessionOverlay(state.pendingReflection);
     await visual.broadcastState(state, sites);
